@@ -27,7 +27,7 @@
         start = (0 <= start) ? start : 0;
         end = (0 <= end) ? end : 0;
 
-        if ("contentEditable" in element || ["INPUT", "TEXTAREA"].indexOf(element.tagName) === -1) {
+        if (!(!("contentEditable" in element) || ["INPUT", "TEXTAREA"].indexOf(element.tagName) !== -1)) {
             var rng = document.createRange(),
                 sel = window.getSelection(),
                 n, o = 0,
@@ -145,7 +145,7 @@
         var fosused = document.activeElement;
         element.focus();
 
-        if (!("contentEditable" in element) && ["INPUT", "TEXTAREA"].indexOf(element.tagName) !== -1) {
+        if (!("contentEditable" in element) || ["INPUT", "TEXTAREA"].indexOf(element.tagName) !== -1) {
             var match = getWord(element.value, element.selectionStart, true);
 
             fosused.focus();
@@ -262,7 +262,7 @@
     };
 
     $.fn.caret = function(start, end) {
-        if (!("contentEditable" in this[0]) && ["INPUT", "TEXTAREA"].indexOf(this[0].tagName) !== -1) {
+        if (!("contentEditable" in this[0]) || ["INPUT", "TEXTAREA"].indexOf(this[0].tagName) !== -1) {
             console.warn("Compatibility mode.");
         }
         if (typeof(start) === "undefined") {
