@@ -107,12 +107,15 @@
      * @return    {string}            The word.
      */
     function getWord(text, pos, c) {
-        for (var i = 0, length = 0, a = 0, match = [], t = (text || "").split(" "); i < t.length; i++) {
-            length += a = 1 + t[i].length;
+        if (!text || text[pos - 1] === " ") return "";
+        for (var i = 0, length = 0, end = 0, match = [], t = (text || "").split(" "); i < t.length; i++) {
+            end = t[i].length;
+            length += end; 
             if (pos <= length) {
-                match = (t[i].replace(/\s+/g, "") !== "") ? [text.substr(0, length - a), t[i]] : null;
+                match = (t[i].replace(/\s+/g, "") !== "") ? [text.substr(0, length - end), t[i]] : null;
                 return (c || !match) ? match : match[1];
             }
+            length++;
         }
     }
 
@@ -276,7 +279,7 @@
 
         caret.three = [];
         a = caret.node;
-        while (a !== element && a !== element.parentNode && (a = a.parentNode) !== null && a !== element && caret.three.push(a));
+        while (a !== element && a !== element.parentNode && (a = a.parentNode) != null && a !== element && caret.three.push(a));
         caret.three.reverse();
 
         do {
