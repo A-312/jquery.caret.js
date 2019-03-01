@@ -36,12 +36,13 @@ b {
 </style>
 
 <script type="text/javascript">
+  
 function print() {
   var p = document.createElement("p"),
     html = Array.prototype.join.call(arguments, ", ");
   p.innerHTML = html;
   document.getElementById("console").appendChild(p);
-  return text;
+  return p;
 }
 
 function zero(a) {
@@ -61,21 +62,42 @@ function getWord(text, pos, c) {
 
 function replaceWord(text, i, replace) {
   var match = getWord(text, i, true);
-  console.log(match);
   if (!match) return text;
   return match[0] + text.substr(match[0].length).replace(match[1], replace);
 }
 
-var text = "Hello      ! I must to get a word in this sentence a";
+const text = "Hello      ! I <b>must</b> to get a word in this sentence a",
+          textplain = "Hello      ! I must to get a word in this sentence a";
 
-var word = null;
+for (let i = 0, $p, word, caret, line; i <= textplain.length; i++) { // noprotect
+console.info(i);
+  $p = $("<p></p>").appendTo("#console");
+  $p.append("text = \"<span class=str contenteditable=true></span>\";");
+  $p.find(".str").html(text);
+  $p.find(".str").caret(i);
+  caret = $p.find(".str").caret();
+  caret.replaceWord("<u>" + caret.word + "</u>", true);
+   
+  line = print("<span class=number>" + zero(caret.start) + "; </span>" +
+    "<span class=cmt>//" + Array(caret.start + 1).join(" ") + " <b>\\/</b>" +
+    ((caret.word != null) ? " -- " + caret.word : "") + "</span>")
+    
+  $(line).after($p);
+    
+    
+  for (let j=0;j<caret.three.length;j++)
+    caret.three[j] = caret.three[j].tagName+"."+caret.three[j].className;
 
-for (var i = 0; i <= text.length; i++) { // noprotect
-  word = getWord(text, i);
-  print("text = <span class=str>\"" + replaceWord(text, i, "<u>" + word + "</u>") + "\"</span>;");
-  print("<span class=number>" + zero(i) + "; </span>" +
-    "<span class=cmt>// " + Array(i).join(" ") + " <b>^</b>" +
-    ((word !== null) ? " -- " + word : "") + "</span>");
+    
+  word = getWord(textplain, i);
+  print("text = <span class=str>\"" + replaceWord(textplain, i, "<u>" + word + "</u>") + "\"</span>;");
+  print("<span class=number>" + zero(i) + ";</span>" +
+    "<span class=cmt> //" + Array(i+1).join(" ") + " <b>/\\</b>" +
+    ((word != null) ? " -- " + word : "") + "</span>");
+
+  /*$p = $("<p></p>")
+    .text(JSON.stringify(caret, 0, 2))
+    .appendTo("#console");*/
 
   print(" ");
 }

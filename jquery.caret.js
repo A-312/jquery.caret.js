@@ -1,4 +1,18 @@
+/**
+ * @external    "jQuery.fn"
+ * @see         {@link http://learn.jquery.com/plugins/}
+ */
 (function($) {
+    /**
+     * Unwritable object
+     * 
+     * @private   
+     * @function external:"jQuery.fn".caret
+     * 
+     * @param     {object}    obj    Writable object
+     * 
+     * @return    {object}           Unwritable object
+     */
     var protectObject = function(obj) {
         if ("defineProperty" in Object) {
             var newObj = {};
@@ -16,6 +30,18 @@
         return obj;
     };
 
+    /**
+     * Move caret to start. And make a selection if end is different to start.
+     * 
+     * @private   
+     * @function external:"jQuery.fn".caretTo
+     * 
+     * @param     {jQueryObject}   element   This element.
+     * @param     {number}         start     The caret position or the start of the selection
+     * @param     {number}         end       The end of the selection
+     * 
+     * @return    {jQueryObject}             This element.
+     */
     var caretTo = function(element, start, end) {
         if (typeof end === "undefined") {
             end = start;
@@ -68,16 +94,44 @@
         return this;
     };
 
+    /**
+     * Get the word near of position.
+     * 
+     * @private   
+     * @function external:"jQuery.fn".getWord
+     * 
+     * @param     {string}    text    The text (sentence)
+     * @param     {number}    pos     Position
+     * @param     {boolean}   c       Force don't trim
+     *
+     * @return    {string}            The word.
+     */
     function getWord(text, pos, c) {
-        for (var i = 0, length = 0, a = 0, match = [], t = (text || "").split(" "); i < t.length; i++) {
-            length += a = 1 + t[i].length;
+        if (!text || text[pos - 1] === " ") return "";
+        for (var i = 0, length = 0, end = 0, match = [], t = (text || "").split(" "); i < t.length; i++) {
+            end = t[i].length;
+            length += end; 
             if (pos <= length) {
-                match = (t[i].replace(/\s+/g, "") !== "") ? [text.substr(0, length - a), t[i]] : null;
+                match = (t[i].replace(/\s+/g, "") !== "") ? [text.substr(0, length - end), t[i]] : null;
                 return (c || !match) ? match : match[1];
             }
+            length++;
         }
     }
 
+    /**
+     * Replace the word with HTML
+     * 
+     * @private   
+     * @function external:"jQuery.fn".replaceWord
+     * 
+     * @param     {string}    replace    The string that replaces the word on caretObjet.start.
+     * @param     {boolean}   first      Must be the first element in the tree.
+     *
+     * @see       {@link https://jsfiddle.net/A_312/8r7dwb59/}
+     *
+     * @return    {boolean}               Word replaced or not.
+     */
     function replaceWord(replace, first) {
         replace = (replace instanceof Array) ? replace : [replace];
 
@@ -141,6 +195,16 @@
         return f;
     };
 
+    /**
+     * Get info
+     * 
+     * @private   
+     * @function external:"jQuery.fn".caretPos
+     * 
+     * @param     {jQueryObject}   element   This element.
+     *
+     * @return    {caretObject}             Word replaced or not.
+     */
     var caretPos = function(element) {
         var fosused = document.activeElement;
         element.focus();
@@ -150,6 +214,23 @@
 
             fosused.focus();
 
+            /**
+             * The caret Object.
+             * 
+             * @typedef   {Object}     external:"jQuery.fn".caretObject
+             * @property  {number}     start     Start position of the selection.
+             * @property  {number}     end       End position of the selection.
+             * @property  {HTMLElement}   target    HTML element which contain the text.
+             * @property  {NodeElement}   node      Node element which contain the text.
+             * @property  {number}     nodeStart    Start position of the node.
+             * @property  {number}     nodeEnd      End position of the node.
+             * @property  {array}      three        Ancestor/path.
+             * @property  {string}     word         The word String.
+             * @property  {number}     wordStart    Start position in the Element.
+             * @property  {number}     wordStartNode    Start position in the Node.
+             * @property  {function}   replaceWord  Replace word by text or HTML.
+             * @property  {boolean}    cMode        Enable compatibility mode
+             */
             return {
                 start: element.selectionStart,
                 end: element.selectionEnd,
@@ -198,7 +279,7 @@
 
         caret.three = [];
         a = caret.node;
-        while (a !== element && a !== element.parentNode && (a = a.parentNode) !== null && a !== element && caret.three.push(a));
+        while (a !== element && a !== element.parentNode && (a = a.parentNode) != null && a !== element && caret.three.push(a));
         caret.three.reverse();
 
         do {
@@ -261,13 +342,28 @@
         return caret;
     };
 
+
+    /**
+     * jquery.caret.js<br>
+     * Get or Set the caret position, replace a word and get or replace the selection content.
+     * 
+     * @function external:"jQuery.fn".caret
+     *
+     * @param   {number|{start:number,end:number}}  [start]   Start of the selection position.
+     *                                                        <br> Or object {start:number,end:number}
+     * @param   {number}                            [end]     End of the selection position.
+     *
+     * @return  {caretObject|object}        Caret object or jQuery element reference
+     */
     $.fn.caret = function(start, end) {
         if (!("contentEditable" in this[0]) || ["INPUT", "TEXTAREA"].indexOf(this[0].tagName) !== -1) {
             console.warn("Compatibility mode.");
         }
+        //readonly
         if (typeof(start) === "undefined") {
             return protectObject(caretPos(this[0]));
         }
+        //change caret position
         if (typeof(start) === "object" && typeof(end) === "undefined") {
             end = start.end;
             start = start.start;
