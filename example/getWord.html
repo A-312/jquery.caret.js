@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>getWord</title>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script type="text/javascript" src="https://a-312.github.io/jquery.caret.js/v1/jquery.caret.js"></script>
+
+<style id="compiled-css" type="text/css">
+
+p {
+  font-family: SourceCodeProRegular, Menlo, Monaco, consolas, monospace;
+  font-size: 14px;
+  margin: 0;
+}
+
+span.str {
+  color: #c41a16;
+}
+
+span.num {
+  color: #164;
+}
+
+span.cmt {
+  color: #236e25;
+}
+
+u {
+  color: #c41a16;
+}
+
+b {
+  font-family: Menlo, Monaco, consolas, monospace;
+}
+
+</style>
+
+<script type="text/javascript">
+function print() {
+  var p = document.createElement("p"),
+    html = Array.prototype.join.call(arguments, ", ");
+  p.innerHTML = html;
+  document.getElementById("console").appendChild(p);
+  return text;
+}
+
+function zero(a) {
+  return (a <= 9) ? "0" + a : "" + a;
+}
+
+function getWord(text, pos, c) {
+  if (text[pos - 1] === " ") return null;
+  for (var i = 0, length = 0, a = 0, match = [], t = text.split(" "); i < t.length; i++) {
+    length += a = 1 + t[i].length;
+    if (pos <= length) {
+      match = (t[i] !== "") ? [text.substr(0, length - a), t[i]] : null;
+      return (c || !match) ? match : match[1];
+    }
+  }
+}
+
+function replaceWord(text, i, replace) {
+  var match = getWord(text, i, true);
+  console.log(match);
+  if (!match) return text;
+  return match[0] + text.substr(match[0].length).replace(match[1], replace);
+}
+
+var text = "Hello      ! I must to get a word in this sentence a";
+
+var word = null;
+
+for (var i = 0; i <= text.length; i++) { // noprotect
+  word = getWord(text, i);
+  print("text = <span class=str>\"" + replaceWord(text, i, "<u>" + word + "</u>") + "\"</span>;");
+  print("<span class=number>" + zero(i) + "; </span>" +
+    "<span class=cmt>// " + Array(i).join(" ") + " <b>^</b>" +
+    ((word !== null) ? " -- " + word : "") + "</span>");
+
+  print(" ");
+}
+
+</script>
+</head>
+<body>
+   <pre id="console"></pre>
+</body>
+</html>
